@@ -12,8 +12,8 @@ public class XAuth500pxTask extends AsyncTask<String, Void, AccessToken> {
 	private static final String TAG = "XAuth500pxTask";
 	
 	public interface Delegate {
-		public void success(AccessToken result);
-		public void fail();
+		public void onSuccess(AccessToken result);
+		public void onFail(FiveHundredException e);
 	}
 
 	private Delegate _d;
@@ -44,6 +44,7 @@ public class XAuth500pxTask extends AsyncTask<String, Void, AccessToken> {
 			final String msg = String.format("error %d for username[%s]",
 					e.getStatusCode(), _user);
 			Log.e(TAG, msg, e);
+			_d.onFail(e);
 		}
 
 		return null;
@@ -54,9 +55,7 @@ public class XAuth500pxTask extends AsyncTask<String, Void, AccessToken> {
 	protected void onPostExecute(AccessToken result) {
 
 		if (null != result)
-			_d.success(result);
-		else
-			_d.fail();
+			_d.onSuccess(result);
 
 	}
 }

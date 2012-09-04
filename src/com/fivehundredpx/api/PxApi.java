@@ -22,7 +22,7 @@ import android.util.Log;
 
 import com.fivehundredpx.api.auth.AccessToken;
 
-public class ApiHelper {
+public class PxApi {
 	private static final String TAG = "ApiHelper";
 
 	private static String HOST = "https://api.500px.com/v1";
@@ -31,7 +31,7 @@ public class ApiHelper {
 	private String consumerKey;
 	private String consumerSecret;
 
-	public ApiHelper(AccessToken accessToken, String consumerKey,
+	public PxApi(AccessToken accessToken, String consumerKey,
 			String consumerSecret) {
 		super();
 		this.accessToken = accessToken;
@@ -39,13 +39,12 @@ public class ApiHelper {
 		this.consumerSecret = consumerSecret;
 	}
 
-	public ApiHelper(String consumerKey) {
+	public PxApi(String consumerKey) {
 		super();
 		this.consumerKey = consumerKey;
 	}
 
 	public JSONObject get(String url) {
-
 		if (null != accessToken) {
 			HttpGet request = new HttpGet(HOST + url);
 			return handleSigned(request);
@@ -54,7 +53,6 @@ public class ApiHelper {
 					url, this.consumerKey);
 			return handle(new HttpGet(finalUrl));
 		}
-
 	}
 
 	public JSONObject post(String url) {
