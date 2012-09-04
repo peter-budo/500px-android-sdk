@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -23,11 +26,11 @@ public class ApiHelper {
 	private static final String TAG = "ApiHelper";
 
 	private static String HOST = "https://api.500px.com/v1";
-	
+
 	private AccessToken accessToken;
 	private String consumerKey;
 	private String consumerSecret;
-	
+
 	public ApiHelper(AccessToken accessToken, String consumerKey,
 			String consumerSecret) {
 		super();
@@ -35,33 +38,52 @@ public class ApiHelper {
 		this.consumerKey = consumerKey;
 		this.consumerSecret = consumerSecret;
 	}
-	
+
 	public ApiHelper(String consumerKey) {
 		super();
 		this.consumerKey = consumerKey;
 	}
-	
+
 	public JSONObject get(String url) {
-		HttpGet request = new HttpGet(HOST + url);
-		return handle(request);
+
+		if (null != accessToken) {
+			HttpGet request = new HttpGet(HOST + url);
+			return handleSigned(request);
+		} else {
+			final String finalUrl = String.format("%s%s&consumer_key=%s", HOST,
+					url, this.consumerKey);
+			return handle(new HttpGet(finalUrl));
+		}
 
 	}
 
 	public JSONObject post(String url) {
 		HttpPost request = new HttpPost(HOST + url);
-		return handle(request);
+		return handleSigned(request);
+	}
 
+	private void signRequest(HttpUriRequest request)
+			throws OAuthMessageSignerException,
+			OAuthExpectationFailedException, OAuthCommunicationException {
+		CommonsHttpOAuthConsumer consumer = new CommonsHttpOAuthConsumer(
+				consumerKey, consumerSecret);
+		consumer.setTokenWithSecret(accessToken.getToken(),
+				accessToken.getTokenSecret());
+		consumer.sign(request);
+	}
+
+	private JSONObject handleSigned(HttpUriRequest request) {
+		try {
+			signRequest(request);
+		} catch (Exception e) {
+			Log.e(TAG, "Erro trying to sign the request.", e);
+		}
+		return handle(request);
 	}
 
 	private JSONObject handle(HttpUriRequest request) {
 		try {
 			DefaultHttpClient client = new DefaultHttpClient();
-			CommonsHttpOAuthConsumer consumer = new CommonsHttpOAuthConsumer(
-					consumerKey, consumerSecret);
-
-			consumer.setTokenWithSecret(accessToken.getToken(),
-					accessToken.getTokenSecret());
-			consumer.sign(request);
 
 			HttpResponse response = client.execute(request);
 			final int statusCode = response.getStatusLine().getStatusCode();
@@ -87,7 +109,7 @@ public class ApiHelper {
 			JSONObject json = new JSONObject(total.toString());
 			return json;
 		} catch (Exception e) {
-			Log.e(TAG, "", e);
+			Log.e(TAG, "Error obtaining response from 500px api.", e);
 		}
 		return null;
 	}
