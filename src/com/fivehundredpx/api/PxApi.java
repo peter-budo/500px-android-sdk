@@ -3,6 +3,8 @@ package com.fivehundredpx.api;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.exception.OAuthCommunicationException;
@@ -12,6 +14,8 @@ import oauth.signpost.exception.OAuthMessageSignerException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -55,8 +59,13 @@ public class PxApi {
 		}
 	}
 
-	public JSONObject post(String url) {
+	public JSONObject post(String url, List<? extends NameValuePair> params) {
 		HttpPost request = new HttpPost(HOST + url);
+		try {
+			request.setEntity(new UrlEncodedFormEntity(params));
+		} catch (UnsupportedEncodingException e) {
+			Log.e(TAG, "Parameters in post are invalid", e);
+		}
 		return handleSigned(request);
 	}
 
