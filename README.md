@@ -6,8 +6,9 @@ Installation
 ------------
 
 - clone the repository  
+    <pre>git clone git://github.com/500px/500px-android-sdk</pre>
 - add it as a dependency in your project  
-    - android.library.reference.1=../../../500px-android-sdk
+    <pre>android.library.reference.1=../../../500px-android-sdk</pre>
 
 
 Usage
