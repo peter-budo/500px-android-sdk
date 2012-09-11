@@ -13,11 +13,11 @@ Installation
 
 Usage
 -----
+Here is an [login activity](https://gist.github.com/3625085) sample.  
 
-
-Here is an [example](https://gist.github.com/3625085) of a login activity
-
-
+Examples
+--------
+[TroubledPixels](https://github.com/arthurnn/TroubledPixels)
 
 
 questions/suggestions/requests
