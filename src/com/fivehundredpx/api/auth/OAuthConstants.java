@@ -94,6 +94,8 @@ final public class OAuthConstants {
 
 
 	public static final String X_TOKEN = "x_auth_token";
+	
+	public static final String X_SECRET = "x_auth_secret";
 
 	
 	/**
