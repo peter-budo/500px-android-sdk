@@ -1,15 +1,21 @@
 package com.fivehundredpx.api.auth;
 
+import android.util.Log;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.fivehundredpx.api.FiveHundredException;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
 
 public class OAuthAuthorization {
 
@@ -26,7 +32,7 @@ public class OAuthAuthorization {
 
 	
 	public static OAuthAuthorization build(String url, String k, String s) throws FiveHundredException {
-		OAuthAuthorization.Builder builder = new OAuthAuthorization.Builder();
+		Builder builder = new Builder();
 
 		OAuthAuthorization oauth = builder.url(url).consumerKey(k).consumerSecret(s)
 				.build();
@@ -54,34 +60,66 @@ public class OAuthAuthorization {
 
 	}
 
-	public AccessToken getAccessToken(OAuthProvider provider)
-			throws FiveHundredException {
-		try {
-			final HttpPost post = new HttpPost(access_token_url);
-			
-			provider.setOAuthConsumer(consumerKey, consumerSecret);
-			provider.setOAuthRequestToken(requestOauthToken, requestOauthSecret);
-			
-			provider.signForAccessToken(post);
+    public boolean authorize(OAuthProvider provider)
+            throws FiveHundredException {
+        try {
+            final HttpPost post = new HttpPost(authorize_url);
 
-			HttpClient httpClient = new DefaultHttpClient();
-			HttpResponse response = httpClient.execute(post);
+            provider.setOAuthConsumer(consumerKey, consumerSecret);
+            provider.setOAuthRequestToken(requestOauthToken, requestOauthSecret);
 
-			int statusCode = response.getStatusLine().getStatusCode();
+            provider.signForAccessToken(post);
 
-			if (statusCode != HttpStatus.SC_OK) {
-				throw new FiveHundredException(statusCode);
-			}
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpResponse response = httpClient.execute(post);
 
-			return new AccessToken(response);
+            int statusCode = response.getStatusLine().getStatusCode();
 
-		} catch (FiveHundredException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new FiveHundredException(e);
-		}
+            if (statusCode != HttpStatus.SC_OK) {
+                HttpEntity entity = response.getEntity();
+                String responseString = EntityUtils.toString(entity, "UTF-8");
 
-	}
+                //throw new FiveHundredException(responseString);
+                return false;
+            }
+
+            return true;
+        } catch (FiveHundredException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FiveHundredException(e);
+        }
+    }
+
+    public AccessToken getAccessToken(OAuthProvider provider)
+            throws FiveHundredException {
+        try {
+            final HttpPost post = new HttpPost(access_token_url);
+
+            provider.setOAuthConsumer(consumerKey, consumerSecret);
+            provider.setOAuthRequestToken(requestOauthToken, requestOauthSecret);
+
+            provider.signForAccessToken(post);
+
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpResponse response = httpClient.execute(post);
+
+            int statusCode = response.getStatusLine().getStatusCode();
+
+            if (statusCode != HttpStatus.SC_OK) {
+                throw new FiveHundredException(statusCode);
+            }
+
+            return new AccessToken(response);
+
+        } catch (ClientProtocolException e) {
+            Log.e("OAuthAuthorization", "Failed", e);
+            throw new FiveHundredException(e);
+        } catch (IOException e) {
+            Log.e("OAuthAuthorization", "Failed", e);
+            throw new FiveHundredException(e);
+        }
+    }
 
 
 	@Override
