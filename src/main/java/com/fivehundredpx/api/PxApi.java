@@ -62,7 +62,7 @@ public class PxApi {
 	public JSONObject post(String url, List<? extends NameValuePair> params) {
 		HttpPost request = new HttpPost(HOST + url);
 		try {
-			request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+            if (params != null) request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			Log.e(TAG, "Parameters in post are invalid", e);
 		}
