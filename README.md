@@ -14,9 +14,24 @@ Installation
 - include module in settings.gradle
     <pre>include ':moduleA', ':500px-android-sdk'</pre>
 
+OR
+
+1. Build project which will produce '500px-android-sdk.aar' file
+2. Copy <strong>aar</strong> to your <strong>lib</strong> folder
+3. In your <strong>build.gradle</strong> add wait to fetch dependencies as
+    <pre>
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+    </pre>
+4. Add <strong>aar</strong> as project dependency
+    <pre>compile (name:'500px-android-sdk', ext:'aar')</pre>
+
 Usage
 -----
-Here is an [login activity](https://gist.github.com/3625085) sample.  
+Here is an [login activity](https://gist.github.com/3625085) sample.
 
 Examples
 --------

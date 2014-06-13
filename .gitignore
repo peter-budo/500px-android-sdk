@@ -17,3 +17,6 @@ local.properties
 .DS_Store
 .classpath
 .project
+
+# Exclude IntelliJ file
+*.iml
