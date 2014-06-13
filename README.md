@@ -16,9 +16,9 @@ Installation
 
 OR
 
-1. Build project which will produce '500px-android-sdk.aar' file
+1. Build project which will produce <strong>500px-android-sdk.aar</strong> file
 2. Copy <strong>aar</strong> to your <strong>lib</strong> folder
-3. In your <strong>build.gradle</strong> add wait to fetch dependencies as
+3. In your <strong>build.gradle</strong> new dependency inside libs folder as
     <pre>
     repositories {
         flatDir {
